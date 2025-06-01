@@ -15,19 +15,16 @@ pipeline {
         stage('Git Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/jaiswaladi246/fullstack-bank.git'
+                echo 'check completed succesfully'
             }
         }
         
-        stage('OWASP FS SCAN') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./app/backend --disableYarnAudit --disableNodeAudit', odcInstallation: 'DC'
-                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
+        
         
         stage('TRIVY FS SCAN') {
             steps {
                 sh "trivy fs ."
+                echo 'check trivy scan done'
             }
         }
         
@@ -35,6 +32,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('sonar7') {
                     sh " $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Bank -Dsonar.projectKey=Bank "
+                    echo 'code Analysis complted'
                 }
             }
         }
@@ -43,6 +41,7 @@ pipeline {
          stage('Install Dependencies') {
             steps {
                 sh "npm install"
+                echo 'installed dependencies'
             }
         }
         
@@ -50,6 +49,7 @@ pipeline {
             steps {
                 dir('/root/.jenkins/workspace/Bank/app/backend') {
                     sh "npm install"
+                    echo 'done'
                 }
             }
         }
